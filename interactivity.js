@@ -252,14 +252,61 @@ function inClassExampleOfStaticAddD3VisToPage(){
             .text("Purchase Amount ($USD)")
 
         // Bars
-        svg.selectAll("mybar")
-            .data(data)
-            .join("rect")
-                .attr("x", d => x(d.Customer))
-                .attr("y", d => y(parseFloat(d.PurchaseAmount.replace("$", ""))))
-                .attr("width", x.bandwidth())
-                .attr("height", d => height - y(parseFloat(d.PurchaseAmount.replace("$", ""))))
-                .attr("fill", "#69b3a2")
+        // Bars
+    const bars = svg.selectAll("mybar")
+    .data(data)      
+    .join("rect")
+        .attr("x", d => x(d.Customer))
+        .attr("y", d => y(parseFloat(d.PurchaseAmount.replace("$", ""))))
+        .attr("width", x.bandwidth())
+        .attr("height", d => height - y(parseFloat(d.PurchaseAmount.replace("$", ""))))
+        .attr("fill", "#69b3a2")
+    
+    const tooltipContainer = svg
+        .append("g")
+        .attr('visibility','hidden')
+    
+    const tooltipBox = tooltipContainer
+        .append('rect')
+        .attr('width',100)
+        .attr('height',40)
+        .attr('fill',"lightgray")
+        .attr('opacity',"50%")
+        .attr('rx',8)
+            // .append("text")
+            // .attr("class", "tooltip")
+            // .attr("fill", "black")
+            // .style("pointer-events", "none");
+    
+    const tooltipText = tooltipContainer
+        .append('text')
+        .attr("x",50)
+        .attr('y',25)
+        .attr("text-anchor", "middle")
+        .attr('display','table-cell')
+        .text("")
+
+    bars.on("mouseover", (evt, d) => {
+        const [mx, my] = d3.pointer(evt);
+        const fixedYPos = my - 40;
+        tooltipContainer
+            .attr("transform", "translate(" + mx + ", " + fixedYPos + ")" )
+            .style("visibility","initial");
+        tooltipText
+            .text(d.PurchaseAmount);
+            
+        })
+        .on("mousemove", (evt, d) => {
+            const [mx, my] = d3.pointer(evt);
+            const fixedYPos = my - 40;
+            tooltipContainer
+                .attr("transform", "translate(" + mx + ", " + fixedYPos + ")" );
+        })
+        .on("mouseout", () => {
+        // clear the tooltip
+        tooltipText.text("");
+        tooltipContainer.style("visibility","hidden")
+        });
     })
 }
 
